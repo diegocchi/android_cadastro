@@ -1,19 +1,31 @@
 package br.fadep.cadastrocomlista;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
-public class MainActivity extends AppCompatActivity {
+import br.fadep.cadastrocomlista.adapter.UsuarioAdapter;
+import br.fadep.cadastrocomlista.dao.UsuarioDAO;
+
+public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener {
+
+    private UsuarioDAO dao;
+    private UsuarioAdapter adapter;
+    private ListView listUsuarios;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,30 +39,40 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, CadastroAct.class);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         });
+
+        listUsuarios = findViewById(R.id.listUsuarios);
+        listUsuarios.setOnItemClickListener(this);
+        carregarUsuarios();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public void carregarUsuarios() {
+        try {
+            dao = new UsuarioDAO(this);
+            cursor = dao.listar();
+            adapter = new UsuarioAdapter(this, cursor);
+            listUsuarios.setAdapter(adapter);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        cursor = dao.listar();
+        adapter.changeCursor(cursor);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+        cursor.moveToPosition(pos);
+        int idUsuario = cursor.getInt(cursor.getColumnIndex(UsuarioDAO.COL_ID));
+        Intent intent = new Intent(this, CadastroAct.class);
+        intent.putExtra("id", idUsuario);
+        startActivityForResult(intent, 0);
     }
 }

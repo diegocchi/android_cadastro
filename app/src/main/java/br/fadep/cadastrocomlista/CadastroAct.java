@@ -14,6 +14,7 @@ import android.widget.Button;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
+import br.fadep.cadastrocomlista.dao.UsuarioDAO;
 import br.fadep.cadastrocomlista.models.Usuario;
 
 public class CadastroAct extends AppCompatActivity {
@@ -22,6 +23,8 @@ public class CadastroAct extends AppCompatActivity {
     private TextInputEditText edtEmail;
     private TextInputEditText edtSenha;
     private Button btnSalvar;
+    public Usuario usuario;
+    public UsuarioDAO dao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +33,31 @@ public class CadastroAct extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_act);
         setSupportActionBar(toolbar);
 
+        dao = new UsuarioDAO(this);
 
         edtNome = findViewById(R.id.edtNome);
         edtEmail = findViewById(R.id.edtEmail);
         edtSenha = findViewById(R.id.edtSenha);
 
         btnSalvar = findViewById(R.id.btnSalvar);
+
+        int id = getIntent().getIntExtra("id", -1);
+        if (id != -1) {
+            usuario = dao.get(id);
+            carregarDados();
+        } else {
+            usuario = new Usuario();
+        }
+    }
+
+    public void carregarDados() {
+        edtNome.setText(usuario.getNome());
+        edtEmail.setText(usuario.getEmail());
+        edtSenha.setText(usuario.getSenha());
     }
 
     public void salvar(View v) {
-        Usuario usuario = new Usuario();
+
         if (edtNome.getText().toString().equals("")) {
             edtNome.setError("Campo inválido");
             edtNome.requestFocus();
@@ -48,8 +66,11 @@ public class CadastroAct extends AppCompatActivity {
         usuario.setEmail(edtEmail.getText().toString());
         usuario.setSenha(edtSenha.getText().toString());
 
+        dao.salvar(usuario);
+
         Snackbar bar = Snackbar.make(v, "Clicou em salvar", 20);
         bar.show();
+        finish();
     }
 
     @Override
