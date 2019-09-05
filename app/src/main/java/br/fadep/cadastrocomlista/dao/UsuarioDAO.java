@@ -34,13 +34,13 @@ public class UsuarioDAO extends DBManager {
     public void salvar(Usuario usuario) {
         db = getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(COL_NOME, usuario.getNome());
-        values.put(COL_EMAIL, usuario.getEmail());
-        values.put(COL_SENHA, usuario.getSenha());
+//        ContentValues values = new ContentValues();
+//        values.put(COL_NOME, usuario.getNome());
+//        values.put(COL_EMAIL, usuario.getEmail());
+//        values.put(COL_SENHA, usuario.getSenha());
 
 
-        db.insert(TABLE_NAME, null, values);
+        db.insert(TABLE_NAME, null, mount(usuario));
         db.close();
     }
 
@@ -75,5 +75,28 @@ public class UsuarioDAO extends DBManager {
             usuario.setSenha(cursor.getString(cursor.getColumnIndex(COL_SENHA)));
         }
         return usuario;
+    }
+
+    public void alterar(Usuario usuario) {
+        db = getWritableDatabase();
+
+        String[] paramsWhere = new String[1];
+        paramsWhere[0] = usuario.getId() + "";
+
+//        ContentValues values = new ContentValues();
+//        values.put(COL_NOME, usuario.getNome());
+//        values.put(COL_EMAIL, usuario.getEmail());
+//        values.put(COL_SENHA, usuario.getSenha());
+
+        db.update(TABLE_NAME, mount(usuario), COL_ID + " = ?", paramsWhere);
+    }
+
+    public ContentValues mount(Usuario usuario) {
+        ContentValues values = new ContentValues();
+        values.put(COL_NOME, usuario.getNome());
+        values.put(COL_EMAIL, usuario.getEmail());
+        values.put(COL_SENHA, usuario.getSenha());
+
+        return values;
     }
 }

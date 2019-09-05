@@ -4,13 +4,13 @@
 
     <item
         android:id="@+id/action_cancelar"
-        android:icon="@drawable/ic_cancel_black_24dp"
+        android:icon="@drawable/ic_cancel_white_24dp"
         android:orderInCategory="1"
         android:title="@string/cancelar"
         app:showAsAction="always|withText" />
     <item
         android:id="@+id/action_salvar"
-        android:icon="@drawable/ic_check_black_24dp"
+        android:icon="@drawable/ic_check_white_24dp"
         android:orderInCategory="2"
         android:title="@string/salvar"
         app:showAsAction="always|withText" />

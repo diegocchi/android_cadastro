@@ -30,7 +30,7 @@ public class CadastroAct extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro);
-        Toolbar toolbar = findViewById(R.id.toolbar_act);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         dao = new UsuarioDAO(this);
@@ -39,7 +39,6 @@ public class CadastroAct extends AppCompatActivity {
         edtEmail = findViewById(R.id.edtEmail);
         edtSenha = findViewById(R.id.edtSenha);
 
-        btnSalvar = findViewById(R.id.btnSalvar);
 
         int id = getIntent().getIntExtra("id", -1);
         if (id != -1) {
@@ -66,7 +65,11 @@ public class CadastroAct extends AppCompatActivity {
         usuario.setEmail(edtEmail.getText().toString());
         usuario.setSenha(edtSenha.getText().toString());
 
-        dao.salvar(usuario);
+        if (usuario.getId() == 0) {
+            dao.salvar(usuario);
+        } else {
+            dao.alterar(usuario);
+        }
 
         Snackbar bar = Snackbar.make(v, "Clicou em salvar", 20);
         bar.show();
