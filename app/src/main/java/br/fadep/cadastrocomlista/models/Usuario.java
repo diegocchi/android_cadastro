@@ -6,6 +6,15 @@ public class Usuario {
     private String nome;
     private String email;
     private String senha;
+    private String imagem;
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
 
     public int getId() {
         return id;

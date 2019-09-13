@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,10 +30,12 @@ import android.widget.ImageButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import br.fadep.cadastrocomlista.dao.UsuarioDAO;
 import br.fadep.cadastrocomlista.models.Usuario;
+import br.fadep.cadastrocomlista.services.UsuarioService;
 
 public class CadastroAct extends AppCompatActivity implements View.OnClickListener {
 
@@ -45,6 +48,7 @@ public class CadastroAct extends AppCompatActivity implements View.OnClickListen
 
     private ImageButton btnImage;
     private File caminhoImagem;
+    private Bitmap imagem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +92,7 @@ public class CadastroAct extends AppCompatActivity implements View.OnClickListen
         usuario.setNome(edtNome.getText().toString());
         usuario.setEmail(edtEmail.getText().toString());
         usuario.setSenha(edtSenha.getText().toString());
+        usuario.setImagem(getImagemBase64());
 
         if (usuario.getId() == 0) {
             dao.salvar(usuario);
@@ -95,8 +100,10 @@ public class CadastroAct extends AppCompatActivity implements View.OnClickListen
             dao.alterar(usuario);
         }
 
-        Snackbar bar = Snackbar.make(v, "Clicou em salvar", 20);
-        bar.show();
+        new UsuarioService(usuario).execute();
+
+//        Snackbar bar = Snackbar.make(v, "Clicou em salvar", 20);
+//        bar.show();
         finish();
     }
 
@@ -170,10 +177,20 @@ public class CadastroAct extends AppCompatActivity implements View.OnClickListen
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
-                Bitmap imagem = BitmapFactory.decodeFile(caminhoImagem.getPath());
+                imagem = BitmapFactory.decodeFile(caminhoImagem.getPath());
                 Bitmap thumbnail = ThumbnailUtils.extractThumbnail(imagem, 400, 400);
                 btnImage.setImageBitmap(thumbnail);
             }
         }
+    }
+
+    private String getImagemBase64() {
+        String imagem64 = "";
+        if (imagem != null) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            imagem.compress(Bitmap.CompressFormat.JPEG, 80, out);
+            imagem64 = Base64.encodeToString(out.toByteArray(), Base64.DEFAULT);
+        }
+        return imagem64;
     }
 }
